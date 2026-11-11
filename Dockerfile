@@ -1,8 +1,8 @@
 FROM python:3.13.18-slim-bookworm AS builder
 WORKDIR /build
 COPY requirements.txt ./
-RUN python -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir --no-deps -r requirements.txt
+RUN python -m venv --without-pip /opt/venv \
+    && python -m pip --python /opt/venv install --no-cache-dir --no-deps -r requirements.txt
 
 FROM python:3.13.18-slim-bookworm AS runtime
 LABEL org.opencontainers.image.title="Container Security Taskboard"
@@ -10,7 +10,9 @@ ENV PATH="/opt/venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DATABASE_PATH=/tmp/taskboard/tasks.db
-RUN groupadd --gid 10001 app \
+RUN python -m pip uninstall --yes pip \
+    && rm -rf /usr/local/lib/python3.13/ensurepip \
+    && groupadd --gid 10001 app \
     && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app
 WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
