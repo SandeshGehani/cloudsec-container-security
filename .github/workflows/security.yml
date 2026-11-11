@@ -78,7 +78,7 @@ jobs:
 
   code-scanning:
     needs: [baseline, hardened]
-    if: always() && vars.UPLOAD_SARIF == 'true' && github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.target == 'both')
+    if: always() && github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.target == 'both')
     runs-on: ubuntu-24.04
     permissions:
       contents: read

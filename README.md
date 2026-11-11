@@ -2,7 +2,7 @@
 
 This project builds and evaluates a container security pipeline around a small Flask task tracker. GitHub Actions collects evidence from Hadolint, Checkov, Trivy, Syft, Grype, and Dockle. One final policy gate determines whether the hardened image can be published to GitHub Container Registry.
 
-The baseline intentionally includes an old Python image, outdated application dependencies, implicit root execution, a fake demonstration token, and a privileged Kubernetes deployment referencing a mutable `latest` tag. The hardened configuration uses current pinned dependencies, a multi-stage build, UID 10001, resource limits, probes, a read-only container filesystem, and a restricted security context.
+The baseline intentionally includes an old Python image, outdated application dependencies, implicit root execution, a fake demonstration token, and a privileged Kubernetes deployment referencing a mutable `latest` tag. The hardened configuration uses current pinned dependencies, a multi-stage build, UID 10001, resource limits, probes, a read-only container filesystem, and a restricted security context. Package installation runs in the build stage, and the runtime image removes pip and its bundled bootstrap installer.
 
 ## Current implementation
 
@@ -99,7 +99,7 @@ Publication requires the application tests and hardened scan job to succeed on a
 ghcr.io/<owner>/<repository>:<commit-sha>
 ```
 
-Evidence artifacts are retained for 30 days. The hardened image archive is retained for one day for the publication handoff. SARIF is always retained as an artifact. Set repository Actions variable `UPLOAD_SARIF` to `true` to enable upload to GitHub code scanning on branch pushes and manual runs targeting both versions. The repository must support and enable code scanning. The SARIF upload job has its own status.
+Evidence artifacts are retained for 30 days. The hardened image archive is retained for one day for the publication handoff. SARIF is retained as an artifact and uploaded to GitHub code scanning on branch pushes and manual runs targeting both versions. The repository must support code scanning. The SARIF upload job has its own status.
 
 Manual dispatch allows selecting baseline, hardened, or both versions, and toggling caches. Collect at least one cold and one warm run per variant, with repeated runs for a meaningful timing comparison. Record GitHub run URLs and the database timestamps from `trivy-version.json` and `grype-db.json`.
 
