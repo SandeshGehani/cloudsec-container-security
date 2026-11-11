@@ -20,7 +20,18 @@ The [verified GitHub Actions run](https://github.com/SandeshGehani/cloudsec-cont
 | Baseline | FAIL | 4,981 | 928.46 | 166.723 |
 | Hardened | PASS | 0 | 127.16 | 100.575 |
 
-These measurements come from one run of each variant. Findings without an available fix remain visible in the scan reports under the agreed gate policy. Repeated cold and warm runs, manual false-positive review, local Kubernetes deployment, and the final report and presentation remain subsequent milestones.
+These measurements come from the initial release run. Findings without an available fix remain visible under the agreed gate policy. The subsequent [repeated evaluation and Kubernetes verification](https://github.com/SandeshGehani/cloudsec-container-security/actions/runs/43103995123) completed three cold and three warm trials per variant and deployed both YAML and Terraform definitions in a hosted kind cluster. All six baseline gates failed with 4,981 blockers. All six hardened gates passed with zero blockers. Every measured trial had zero collection errors.
+
+| Variant | Cold median seconds | Warm median seconds | Trials per condition |
+| --- | --- | --- | --- |
+| Baseline | 92.070 | 33.631 | 3 |
+| Hardened | 79.325 | 14.206 | 3 |
+
+Cold trials disable build-cache use and select fresh vulnerability-database directories. Base-image layers can remain available after the first trial. Separate variant runners, fixed condition order and network variation limit timing generalisation. Collector duration excludes job setup and publication.
+
+The equivalent deployments passed readiness, UID 10001, health, task creation and filesystem-write checks. NetworkPolicy resource creation was verified. Traffic enforcement requires a compatible CNI. Laptop Docker and WSL setup remains pending for a local container demonstration.
+
+The [demonstration guide](docs/DEMO.md), [evaluation summary](docs/evaluation-summary.json), [alias-aware overlap results](docs/overlap.json), and [ten-record finding review](docs/triage.json) document the measured comparison. The review uses purposive selection and has no population false-positive-rate estimate. The [final report](submission/Cloud_Security_Final_Report.docx) and [presentation](submission/Cloud_Security_Presentation.pptx) are available in the submission folder.
 
 The approved image was published as `ghcr.io/sandeshgehani/cloudsec-container-security:07ca919e4a820ee6f55a5bcadec649909835e8a7` with registry digest `sha256:141854f7c4db04171ac8ae45239caa44c72372560c0f7cb03156bccc540c4b98`.
 
@@ -138,17 +149,19 @@ terraform -chdir=infra/terraform apply
 
 Review the plan before approving the apply. The provider defaults to the `kind-container-security` context. The included Terraform dependency lock file records the verified provider selection.
 
-## Evaluation and next milestones
+## Reproduce the evaluation
 
-1. Verify both container builds and complete image scans in Docker or GitHub Actions.
-2. Review every hardened blocking finding and commit each remediation separately.
-3. Collect baseline and hardened results close together in time, recording database timestamps.
-4. Compare per-tool severities, exact vulnerability-ID overlap, image sizes, and stage durations.
-5. Manually review a documented sample of findings for false positives. Record evidence and triage decisions.
-6. Repeat with cold and warm caches and record the run-to-run variation.
-7. Prepare the final report, presentation, and failing-then-passing demonstration from measured evidence.
+The evaluation workflow supports manual dispatch and retains raw evidence for all trials. It measures three cold runs, excludes one cache-seeding warm-up, then measures three warm runs. Run either variant locally on a Linux Docker host with the installed scanner tools.
 
-Exact-ID overlap can undercount matches when one scanner reports a CVE and the other reports a GHSA alias. Manual review should account for aliases before interpreting scanner uniqueness.
+```bash
+python scripts/run_evaluation.py --variant baseline --output reports/evaluation-baseline-new
+python scripts/run_evaluation.py --variant hardened --output reports/evaluation-hardened-new
+python scripts/analyze_overlap.py --baseline reports/evaluation-baseline-new/cold-1 --hardened reports/evaluation-hardened-new/cold-1 --output reports/overlap-new.json
+```
+
+The hosted Kubernetes job installs the pinned tools in `tools/cluster-versions.json`, builds the hardened image and calls `scripts/verify_cluster.py`. It checks a create-only Terraform plan before applying it in the disposable cluster.
+
+Exact-ID overlap can undercount matches when one scanner reports a CVE and the other reports a GHSA alias. The overlap analysis also joins explicit related-advisory links recorded by Grype and compares advisory plus package ecosystem, name and installed version. It records input evidence hashes and preserves separate Debian binary packages. Scanner uniqueness still requires contextual review.
 
 Collector timings cover the stages in `run.json`. Record the GitHub job's total elapsed time separately to include environment setup, report uploads, and other workflow overhead.
 

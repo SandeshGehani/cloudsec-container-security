@@ -1,0 +1,305 @@
+{
+  "source_commit": "4d3888b443da19ed8b583ad38f2efbe0c3c59852",
+  "evaluation_run": "https://github.com/SandeshGehani/cloudsec-container-security/actions/runs/43103995123",
+  "release_run": "https://github.com/SandeshGehani/cloudsec-container-security/actions/runs/43103995163",
+  "variants": {
+    "baseline": {
+      "statistics": {
+        "cold": {
+          "n": 3,
+          "median_seconds": 92.07,
+          "mean_seconds": 102.24666666666667,
+          "sample_stdev_seconds": 18.349121077951757,
+          "minimum_seconds": 91.241,
+          "maximum_seconds": 123.429
+        },
+        "warm": {
+          "n": 3,
+          "median_seconds": 33.631,
+          "mean_seconds": 33.730666666666664,
+          "sample_stdev_seconds": 0.35223902869121876,
+          "minimum_seconds": 33.439,
+          "maximum_seconds": 34.122
+        }
+      },
+      "design": "Three cold trials, one excluded warm-up, then three warm trials on the same runner.",
+      "limitations": [
+        "Base-image downloads can remain cached after the first cold trial.",
+        "Condition order and network variation can affect timing.",
+        "Each variant uses its own runner. The sample size is three per condition."
+      ],
+      "measurements": [
+        {
+          "condition": "cold",
+          "trial": 1,
+          "collector_seconds": 123.429,
+          "process_seconds": 126.303,
+          "passed": false,
+          "collection_errors": [],
+          "blocking_findings": 4981,
+          "cache_observed_before": {
+            "buildx_index": false,
+            "trivy_database": false,
+            "grype_database": false
+          }
+        },
+        {
+          "condition": "cold",
+          "trial": 2,
+          "collector_seconds": 91.241,
+          "process_seconds": 93.39,
+          "passed": false,
+          "collection_errors": [],
+          "blocking_findings": 4981,
+          "cache_observed_before": {
+            "buildx_index": false,
+            "trivy_database": false,
+            "grype_database": false
+          }
+        },
+        {
+          "condition": "cold",
+          "trial": 3,
+          "collector_seconds": 92.07,
+          "process_seconds": 94.303,
+          "passed": false,
+          "collection_errors": [],
+          "blocking_findings": 4981,
+          "cache_observed_before": {
+            "buildx_index": false,
+            "trivy_database": false,
+            "grype_database": false
+          }
+        },
+        {
+          "condition": "warm",
+          "trial": 1,
+          "collector_seconds": 33.631,
+          "process_seconds": 35.81,
+          "passed": false,
+          "collection_errors": [],
+          "blocking_findings": 4981,
+          "cache_observed_before": {
+            "buildx_index": true,
+            "trivy_database": true,
+            "grype_database": true
+          }
+        },
+        {
+          "condition": "warm",
+          "trial": 2,
+          "collector_seconds": 33.439,
+          "process_seconds": 35.61,
+          "passed": false,
+          "collection_errors": [],
+          "blocking_findings": 4981,
+          "cache_observed_before": {
+            "buildx_index": true,
+            "trivy_database": true,
+            "grype_database": true
+          }
+        },
+        {
+          "condition": "warm",
+          "trial": 3,
+          "collector_seconds": 34.122,
+          "process_seconds": 36.464,
+          "passed": false,
+          "collection_errors": [],
+          "blocking_findings": 4981,
+          "cache_observed_before": {
+            "buildx_index": true,
+            "trivy_database": true,
+            "grype_database": true
+          }
+        }
+      ],
+      "image_size_bytes": 928460381,
+      "severity_counts": {
+        "trivy": {
+          "HIGH": 4125,
+          "LOW": 3668,
+          "MEDIUM": 10946,
+          "UNKNOWN": 129,
+          "CRITICAL": 324
+        },
+        "grype": {
+          "HIGH": 1880,
+          "CRITICAL": 372,
+          "MEDIUM": 2227,
+          "NEGLIGIBLE": 1214,
+          "LOW": 316,
+          "UNKNOWN": 3
+        }
+      }
+    },
+    "hardened": {
+      "statistics": {
+        "cold": {
+          "n": 3,
+          "median_seconds": 79.325,
+          "mean_seconds": 83.139,
+          "sample_stdev_seconds": 6.659807504725637,
+          "minimum_seconds": 79.263,
+          "maximum_seconds": 90.829
+        },
+        "warm": {
+          "n": 3,
+          "median_seconds": 14.206,
+          "mean_seconds": 15.828666666666667,
+          "sample_stdev_seconds": 2.858304800635044,
+          "minimum_seconds": 14.151,
+          "maximum_seconds": 19.129
+        }
+      },
+      "design": "Three cold trials, one excluded warm-up, then three warm trials on the same runner.",
+      "limitations": [
+        "Base-image downloads can remain cached after the first cold trial.",
+        "Condition order and network variation can affect timing.",
+        "Each variant uses its own runner. The sample size is three per condition."
+      ],
+      "measurements": [
+        {
+          "condition": "cold",
+          "trial": 1,
+          "collector_seconds": 90.829,
+          "process_seconds": 91.881,
+          "passed": true,
+          "collection_errors": [],
+          "blocking_findings": 0,
+          "cache_observed_before": {
+            "buildx_index": false,
+            "trivy_database": false,
+            "grype_database": false
+          }
+        },
+        {
+          "condition": "cold",
+          "trial": 2,
+          "collector_seconds": 79.325,
+          "process_seconds": 79.61,
+          "passed": true,
+          "collection_errors": [],
+          "blocking_findings": 0,
+          "cache_observed_before": {
+            "buildx_index": false,
+            "trivy_database": false,
+            "grype_database": false
+          }
+        },
+        {
+          "condition": "cold",
+          "trial": 3,
+          "collector_seconds": 79.263,
+          "process_seconds": 79.519,
+          "passed": true,
+          "collection_errors": [],
+          "blocking_findings": 0,
+          "cache_observed_before": {
+            "buildx_index": false,
+            "trivy_database": false,
+            "grype_database": false
+          }
+        },
+        {
+          "condition": "warm",
+          "trial": 1,
+          "collector_seconds": 19.129,
+          "process_seconds": 19.419,
+          "passed": true,
+          "collection_errors": [],
+          "blocking_findings": 0,
+          "cache_observed_before": {
+            "buildx_index": true,
+            "trivy_database": true,
+            "grype_database": true
+          }
+        },
+        {
+          "condition": "warm",
+          "trial": 2,
+          "collector_seconds": 14.151,
+          "process_seconds": 14.407,
+          "passed": true,
+          "collection_errors": [],
+          "blocking_findings": 0,
+          "cache_observed_before": {
+            "buildx_index": true,
+            "trivy_database": true,
+            "grype_database": true
+          }
+        },
+        {
+          "condition": "warm",
+          "trial": 3,
+          "collector_seconds": 14.206,
+          "process_seconds": 14.455,
+          "passed": true,
+          "collection_errors": [],
+          "blocking_findings": 0,
+          "cache_observed_before": {
+            "buildx_index": true,
+            "trivy_database": true,
+            "grype_database": true
+          }
+        }
+      ],
+      "image_size_bytes": 127163104,
+      "severity_counts": {
+        "trivy": {
+          "LOW": 92,
+          "HIGH": 40,
+          "MEDIUM": 105,
+          "CRITICAL": 2,
+          "UNKNOWN": 10
+        },
+        "grype": {
+          "NEGLIGIBLE": 69,
+          "HIGH": 54,
+          "MEDIUM": 92,
+          "CRITICAL": 3,
+          "LOW": 18,
+          "UNKNOWN": 10
+        }
+      }
+    }
+  },
+  "deployment": {
+    "started_at": "2026-11-11T21:33:06.333508+00:00",
+    "commit": "4d3888b443da19ed8b583ad38f2efbe0c3c59852",
+    "environment": "GitHub-hosted Ubuntu runner with a disposable kind cluster",
+    "context": "kind-container-security",
+    "deployments": [
+      {
+        "namespace": "taskboard-hardened",
+        "ready_replicas": 1,
+        "runtime_uid": 10001,
+        "health_check": "passed",
+        "task_creation": "passed",
+        "root_filesystem_write": "rejected",
+        "privileged": false,
+        "privilege_escalation": false,
+        "networkpolicy_resource": "present"
+      },
+      {
+        "namespace": "taskboard-terraform",
+        "ready_replicas": 1,
+        "runtime_uid": 10001,
+        "health_check": "passed",
+        "task_creation": "passed",
+        "root_filesystem_write": "rejected",
+        "privileged": false,
+        "privilege_escalation": false,
+        "networkpolicy_resource": "present"
+      }
+    ],
+    "networkpolicy_scope": "Resource creation verified. Runtime traffic enforcement requires a compatible CNI.",
+    "passed": true,
+    "finished_at": "2026-11-11T21:34:38.799995+00:00"
+  },
+  "artifact_sha256": {
+    "evaluation-baseline": "19219197dbdbc7adf74207a1ecb77faa3e7787a31ff11afc5a20b7ebc1f5385c",
+    "evaluation-hardened": "7347f75527a28d9608b0fcfd6e316abed003d884f180828322331d818265af79",
+    "kubernetes-demo": "dce51357ed68cba40b54876a7027afd36d60f44c1309de043e86086384211f7f"
+  }
+}

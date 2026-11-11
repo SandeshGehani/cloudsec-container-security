@@ -1,0 +1,193 @@
+{
+  "method": "Deduplicate by advisory, PURL ecosystem, package name, and installed version. Normalize PyPI names. Join only Grype explicit related-advisory IDs. Keep Debian binary packages separate. Compare exact versions.",
+  "limitations": [
+    "An unmatched report record does not establish a false positive or missed vulnerability.",
+    "Alias coverage is limited to the related-advisory links present in these reports.",
+    "Package cataloguing and source versus binary matching differ between scanners."
+  ],
+  "variants": {
+    "baseline": {
+      "commit": "4d3888b443da19ed8b583ad38f2efbe0c3c59852",
+      "exact_advisory_ids": {
+        "trivy": 13126,
+        "grype": 1424,
+        "shared": 1370,
+        "trivy_only": 11756,
+        "grype_only": 54,
+        "jaccard": 0.1039453717754173
+      },
+      "alias_normalized_advisory_ids": {
+        "trivy": 13126,
+        "grype": 1424,
+        "shared": 1396,
+        "trivy_only": 11730,
+        "grype_only": 28,
+        "jaccard": 0.10612741371445948
+      },
+      "alias_normalized_package_findings": {
+        "trivy": 19192,
+        "grype": 6012,
+        "shared": 5897,
+        "trivy_only": 13295,
+        "grype_only": 115,
+        "jaccard": 0.30543326254726266
+      },
+      "explicit_alias_groups": [
+        [
+          "CVE-2022-40897",
+          "GHSA-r9hx-vwmv-q579"
+        ],
+        [
+          "CVE-2022-40898",
+          "GHSA-qwmp-2cf2-g9g6"
+        ],
+        [
+          "CVE-2023-23934",
+          "GHSA-px8h-6qxv-m22q"
+        ],
+        [
+          "CVE-2023-25577",
+          "GHSA-xg9f-g7g7-2323"
+        ],
+        [
+          "CVE-2023-30861",
+          "GHSA-m2qf-hxjv-5gpq"
+        ],
+        [
+          "CVE-2023-46136",
+          "GHSA-hrfv-mqp8-q5rw"
+        ],
+        [
+          "CVE-2023-5752",
+          "GHSA-mq26-g339-26xf"
+        ],
+        [
+          "CVE-2024-1135",
+          "GHSA-w3h3-4rj7-4ph4"
+        ],
+        [
+          "CVE-2024-34069",
+          "GHSA-2g68-c3qc-8985"
+        ],
+        [
+          "CVE-2024-49766",
+          "GHSA-f9vj-2wh5-fj8j"
+        ],
+        [
+          "CVE-2024-49767",
+          "GHSA-q34m-jh98-gwm2"
+        ],
+        [
+          "CVE-2024-6345",
+          "GHSA-cx63-2mw6-8hw5"
+        ],
+        [
+          "CVE-2024-6827",
+          "GHSA-hc5x-x2vx-497g"
+        ],
+        [
+          "CVE-2025-47273",
+          "GHSA-5rjg-fvgr-3xxf"
+        ],
+        [
+          "CVE-2025-66221",
+          "GHSA-hgf8-39gv-g3f2"
+        ],
+        [
+          "CVE-2025-8869",
+          "GHSA-4xh5-x5gv-qwph"
+        ],
+        [
+          "CVE-2026-102598",
+          "GHSA-g6x2-hccm-hh4m"
+        ],
+        [
+          "CVE-2026-13346",
+          "GHSA-qwm4-qh6w-59xr"
+        ],
+        [
+          "CVE-2026-1703",
+          "GHSA-6vgw-5pg2-w6jp"
+        ],
+        [
+          "CVE-2026-21860",
+          "GHSA-87hc-h4r5-73f7"
+        ],
+        [
+          "CVE-2026-27199",
+          "GHSA-29vq-49wr-vm6x"
+        ],
+        [
+          "CVE-2026-27205",
+          "GHSA-68rp-wp8r-4726"
+        ],
+        [
+          "CVE-2026-3219",
+          "GHSA-58qw-9mgm-455v"
+        ],
+        [
+          "CVE-2026-59890",
+          "GHSA-h35f-9h28-mq5c"
+        ],
+        [
+          "CVE-2026-6357",
+          "GHSA-jp4c-xjxw-mgf9"
+        ],
+        [
+          "CVE-2026-8643",
+          "GHSA-wf93-45jw-7689"
+        ]
+      ],
+      "unknown_package_ecosystem": {
+        "trivy": 0,
+        "grype": 0
+      },
+      "evidence_sha256": {
+        "run.json": "b8ea19776cdffdebd28482d2ed37c3f7aa1699d1f5689b7f152a8a28ebd3aca5",
+        "trivy.json": "db43a10a021c7ccf07d532db4f2151c0f08a1fbfc15c5a20525cc3124898df44",
+        "grype.json": "fe0875ba042012ee6e87520637d90c7be744810cbc9ad05d5b67693078ec49e6",
+        "gate.json": "f159baed0b8a72fe3feb70f55a67292cd705e6f29bf6ee8aa4bdb812e6be2fb4",
+        "sbom.syft.json": "8568fd0d4b3981abea03b8ca39cd127482744f8b4594a354837ccdbdef350f00"
+      }
+    },
+    "hardened": {
+      "commit": "4d3888b443da19ed8b583ad38f2efbe0c3c59852",
+      "exact_advisory_ids": {
+        "trivy": 125,
+        "grype": 123,
+        "shared": 120,
+        "trivy_only": 5,
+        "grype_only": 3,
+        "jaccard": 0.9375
+      },
+      "alias_normalized_advisory_ids": {
+        "trivy": 125,
+        "grype": 123,
+        "shared": 120,
+        "trivy_only": 5,
+        "grype_only": 3,
+        "jaccard": 0.9375
+      },
+      "alias_normalized_package_findings": {
+        "trivy": 249,
+        "grype": 246,
+        "shared": 243,
+        "trivy_only": 6,
+        "grype_only": 3,
+        "jaccard": 0.9642857142857143
+      },
+      "explicit_alias_groups": [],
+      "unknown_package_ecosystem": {
+        "trivy": 0,
+        "grype": 0
+      },
+      "evidence_sha256": {
+        "run.json": "728719915ed2f30b6c490dae8b2419461209e72dd62bc3d8e8a03568108b6040",
+        "trivy.json": "59a1b51462c3f36f570945acfe25539adb0bd25c8fab4f7dfc7f4acc9811012a",
+        "grype.json": "295a933201220ec0eafb38750a6142f0e399f5bbeb5d2fec13634e17da03c182",
+        "gate.json": "6f0f15b568068b01f9b46b570ff42aa66063ab8ae0dd9d6b9ef3515c0be1113e",
+        "sbom.syft.json": "753bf83f4140e475f45be8fbd5a85cc32100eaaab916de9bf42bcd97d42487cd"
+      }
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "review_date": "2026-11-12",
+  "method": "Purposive review of ten records covering application packages, platform applicability, image identity, infrastructure and the synthetic secret. Inspect the recorded package versions, application source and upstream advisories. Exploit execution is outside the project scope.",
+  "limitations": "This selected sample supports case analysis. It cannot estimate a population false-positive rate. Affected-version detection and application exploitability are separate review questions. These reviews do not change the release policy or suppress any raw findings.",
+  "records": [
+    {
+      "finding": "CVE-2023-25577",
+      "subject": "Werkzeug 2.2.2 in baseline",
+      "classification": "Affected package confirmed",
+      "evidence": "The baseline Trivy report records version 2.2.2. The upstream advisory lists versions through 2.2.2 and a 2.2.3 patch. The app accesses request.form and caps request bodies at 16 KiB. No exploitability test was performed.",
+      "action": "Upgrade through the hardened requirements. Preserve the request size limit.",
+      "source": "https://github.com/pallets/werkzeug/security/advisories/GHSA-xg9f-g7g7-2323"
+    },
+    {
+      "finding": "CVE-2024-1135",
+      "subject": "gunicorn 20.1.0 in baseline",
+      "classification": "Affected package confirmed",
+      "evidence": "The baseline report records 20.1.0. The upstream 22.0 release addresses HTTP parser request smuggling. Reachability depends on the deployed network path and HTTP request handling.",
+      "action": "Upgrade to the hardened pinned version.",
+      "source": "https://github.com/benoitc/gunicorn/releases/tag/22.0.0"
+    },
+    {
+      "finding": "CVE-2023-30861",
+      "subject": "Flask 2.2.2 in baseline",
+      "classification": "Affected package with unmet application prerequisites",
+      "evidence": "The package version is in the advisory range. The supplied app does not use permanent sessions, and its manifests contain no caching proxy. The advisory requires permanent-session and proxy-caching conditions.",
+      "action": "Retain the inventory finding and upgrade the package. Record the contextual review separately.",
+      "source": "https://github.com/pallets/flask/security/advisories/GHSA-m2qf-hxjv-5gpq"
+    },
+    {
+      "finding": "CVE-2024-34069",
+      "subject": "Werkzeug 2.2.2 in baseline",
+      "classification": "Affected package with unmet application prerequisites",
+      "evidence": "The advisory concerns the interactive debugger. Both container entry points run Gunicorn, and the application does not enable the Werkzeug debugger. The installed version is still in the affected range.",
+      "action": "Upgrade the package and keep the debugger disabled in the container.",
+      "source": "https://github.com/pallets/werkzeug/security/advisories/GHSA-2g68-c3qc-8985"
+    },
+    {
+      "finding": "CVE-2024-49766",
+      "subject": "Werkzeug 2.2.2 in baseline Linux image",
+      "classification": "Platform inapplicable",
+      "evidence": "The upstream advisory requires Windows with Python below 3.11. The scan target is a Linux image. Version-only matching omits this platform qualification.",
+      "action": "Record platform inapplicability in the review. Keep the raw result and the hardened dependency upgrade.",
+      "source": "https://github.com/pallets/werkzeug/security/advisories/GHSA-f9vj-2wh5-fj8j"
+    },
+    {
+      "finding": "CVE-2023-45853",
+      "subject": "zlib1g 1:1.2.13.dfsg-1 in hardened image",
+      "classification": "Distribution binary inapplicable",
+      "evidence": "Trivy flags the Debian Bookworm zlib1g package. Debian explains that the vulnerable contrib/minizip code is not built into binary packages from this source version. This is an overbroad source-package association for the reported binary.",
+      "action": "Document the Debian qualification. Keep the raw unfixed finding visible. No policy exception was added.",
+      "source": "https://security-tracker.debian.org/tracker/CVE-2023-45853"
+    },
+    {
+      "finding": "CVE-2025-47273",
+      "subject": "setuptools 70.3.0 bundled in pip in the first hardened attempt",
+      "classification": "Affected package confirmed",
+      "evidence": "The initial hardened report records the vendored package. The upstream setuptools issue describes the vulnerable PackageIndex path handling. Runtime package installation is unnecessary for this app.",
+      "action": "Remove pip and ensurepip from the runtime image. The subsequent hardened gate has zero fixable HIGH or CRITICAL findings.",
+      "source": "https://github.com/pypa/setuptools/issues/4946"
+    },
+    {
+      "finding": "runtime-user",
+      "subject": "baseline image Config.User",
+      "classification": "Configuration confirmed",
+      "evidence": "The baseline Dockerfile has no USER instruction and image-inspect.json has an empty Config.User, which selects the default root identity.",
+      "action": "Set numeric UID 10001 in the hardened Dockerfile and verify the process UID in Kubernetes.",
+      "source": "Dockerfile.baseline and image-inspect.json"
+    },
+    {
+      "finding": "privileged-container",
+      "subject": "baseline Kubernetes Deployment",
+      "classification": "Configuration confirmed",
+      "evidence": "infra/kubernetes/baseline/app.yaml explicitly sets privileged true and runAsUser 0. The hardened runtime verification records privileged false and UID 10001.",
+      "action": "Apply the hardened security context and retain the baseline only as the evaluation fixture.",
+      "source": "infra/kubernetes/baseline/app.yaml and Kubernetes verification.json"
+    },
+    {
+      "finding": "project-demo-token",
+      "subject": "baseline demonstration token",
+      "classification": "Synthetic fixture detected",
+      "evidence": "fixtures/dummy-secret.txt contains the deliberately fictional DEMO_ONLY token. policy/trivy-secret.yaml matches this fixture. It has no external credential value.",
+      "action": "Keep it in the baseline demonstration and exclude it from false-positive-rate calculations.",
+      "source": "fixtures/dummy-secret.txt and policy/trivy-secret.yaml"
+    }
+  ]
+}
