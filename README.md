@@ -29,7 +29,9 @@ These measurements come from the initial release run. Findings without an availa
 
 Cold trials disable build-cache use and select fresh vulnerability-database directories. Base-image layers can remain available after the first trial. Separate variant runners, fixed condition order and network variation limit timing generalisation. Collector duration excludes job setup and publication.
 
-The equivalent deployments passed readiness, UID 10001, health, task creation and filesystem-write checks. NetworkPolicy resource creation was verified. Traffic enforcement requires a compatible CNI. Laptop Docker and WSL setup remains pending for a local container demonstration.
+The equivalent deployments passed readiness, UID 10001, health, task creation and filesystem-write checks. The [follow-up Calico verification](https://github.com/SandeshGehani/cloudsec-container-security/actions/runs/43110425889) also passed 16 cross-node NetworkPolicy checks across both definitions. Same-namespace ingress succeeded, cross-namespace ingress and application egress timed out, removing each policy enabled those paths, and restoring it blocked them again. The [retained traffic evidence](docs/networkpolicy-verification.json) records every check and repeated observation.
+
+Windows kind and kubectl binaries are installed and checksum-verified in `.tools/bin`. Docker Desktop's signed per-user installer identified disabled Virtual Machine Platform as its prerequisite failure. Enabling the Windows features requires administrator approval and a restart. The [Windows setup guide](docs/WINDOWS_SETUP.md) records the prepared commands.
 
 The [demonstration guide](docs/DEMO.md), [evaluation summary](docs/evaluation-summary.json), [alias-aware overlap results](docs/overlap.json), and [ten-record finding review](docs/triage.json) document the measured comparison. The review uses purposive selection and has no population false-positive-rate estimate. The [final report](submission/Cloud_Security_Final_Report.docx) and [presentation](submission/Cloud_Security_Presentation.pptx) are available in the submission folder.
 
@@ -136,7 +138,7 @@ kubectl --context kind-container-security -n taskboard-hardened rollout status d
 kubectl --context kind-container-security -n taskboard-hardened port-forward service/taskboard 8080:8080
 ```
 
-The service is accessible through the loopback port forward. Runtime NetworkPolicy enforcement requires a compatible CNI. kind's default CNI provides a local environment for this project's static policy evaluation.
+The service is accessible through the loopback port forward. This manual recipe uses kind's default CNI. For the automated traffic-enforcement demonstration, `scripts/verify_cluster.py` creates a fresh two-node cluster from `infra/kind-calico.yaml`, installs checksum-pinned Calico 3.33.0, runs both deployment definitions and checks allowed and denied traffic with policy-removal and restoration controls. It refuses an existing cluster with the same name and deletes the cluster it creates after collecting evidence.
 
 Terraform provides the equivalent hardened deployment in its own namespace. Load the image into kind first, then run these commands from the project folder.
 
@@ -159,7 +161,7 @@ python scripts/run_evaluation.py --variant hardened --output reports/evaluation-
 python scripts/analyze_overlap.py --baseline reports/evaluation-baseline-new/cold-1 --hardened reports/evaluation-hardened-new/cold-1 --output reports/overlap-new.json
 ```
 
-The hosted Kubernetes job installs the pinned tools in `tools/cluster-versions.json`, builds the hardened image and calls `scripts/verify_cluster.py`. It checks a create-only Terraform plan before applying it in the disposable cluster.
+The hosted Kubernetes job installs the pinned tools in `tools/cluster-versions.json`, verifies the Calico manifest in `tools/network-versions.json`, builds the hardened image and calls `scripts/verify_cluster.py`. It checks a create-only Terraform plan before applying it in the disposable cluster. Traffic tests use pod IP addresses to avoid DNS-dependent results. A denied test requires two consecutive connection timeouts, and the same path must become reachable when the policy is removed.
 
 Exact-ID overlap can undercount matches when one scanner reports a CVE and the other reports a GHSA alias. The overlap analysis also joins explicit related-advisory links recorded by Grype and compares advisory plus package ecosystem, name and installed version. It records input evidence hashes and preserves separate Debian binary packages. Scanner uniqueness still requires contextual review.
 

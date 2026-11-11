@@ -265,9 +265,9 @@
     }
   },
   "deployment": {
-    "started_at": "2026-11-11T21:33:06.333508+00:00",
-    "commit": "4d3888b443da19ed8b583ad38f2efbe0c3c59852",
-    "environment": "GitHub-hosted Ubuntu runner with a disposable kind cluster",
+    "started_at": "2026-11-11T22:17:14.673774+00:00",
+    "commit": "eb5fcd220139ee6f758016ce772faafff7967d4d",
+    "environment": "GitHub-hosted Ubuntu runner",
     "context": "kind-container-security",
     "deployments": [
       {
@@ -279,7 +279,160 @@
         "root_filesystem_write": "rejected",
         "privileged": false,
         "privilege_escalation": false,
-        "networkpolicy_resource": "present"
+        "networkpolicy_resource": "present",
+        "network_policy": {
+          "namespace": "taskboard-hardened",
+          "client_node": "container-security-control-plane",
+          "application_node": "container-security-worker",
+          "cross_node": true,
+          "checks": [
+            {
+              "source_namespace": "taskboard-hardened",
+              "source": "pod/allowed-client",
+              "destination_ip": "192.168.131.197",
+              "expected": "allowed",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": true
+                },
+                {
+                  "reachable": true
+                }
+              ],
+              "phase": "enforced",
+              "check": "same-namespace-ingress"
+            },
+            {
+              "source_namespace": "taskboard-policy-probes",
+              "source": "pod/outside-client",
+              "destination_ip": "192.168.131.197",
+              "expected": "denied",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                },
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                }
+              ],
+              "phase": "enforced",
+              "check": "cross-namespace-ingress"
+            },
+            {
+              "source_namespace": "taskboard-hardened",
+              "source": "deployment/taskboard",
+              "destination_ip": "192.168.175.2",
+              "expected": "denied",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                },
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                }
+              ],
+              "phase": "enforced",
+              "check": "application-egress"
+            },
+            {
+              "source_namespace": "taskboard-policy-probes",
+              "source": "pod/outside-client",
+              "destination_ip": "192.168.131.197",
+              "expected": "allowed",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": true
+                },
+                {
+                  "reachable": true
+                }
+              ],
+              "phase": "control-without-policy",
+              "check": "cross-namespace-ingress"
+            },
+            {
+              "source_namespace": "taskboard-hardened",
+              "source": "deployment/taskboard",
+              "destination_ip": "192.168.175.2",
+              "expected": "allowed",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": true
+                },
+                {
+                  "reachable": true
+                }
+              ],
+              "phase": "control-without-policy",
+              "check": "application-egress"
+            },
+            {
+              "source_namespace": "taskboard-policy-probes",
+              "source": "pod/outside-client",
+              "destination_ip": "192.168.131.197",
+              "expected": "denied",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                },
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                }
+              ],
+              "phase": "restored",
+              "check": "cross-namespace-ingress"
+            },
+            {
+              "source_namespace": "taskboard-hardened",
+              "source": "deployment/taskboard",
+              "destination_ip": "192.168.175.2",
+              "expected": "denied",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                },
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                }
+              ],
+              "phase": "restored",
+              "check": "application-egress"
+            },
+            {
+              "source_namespace": "taskboard-hardened",
+              "source": "pod/allowed-client",
+              "destination_ip": "192.168.131.197",
+              "expected": "allowed",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": true
+                },
+                {
+                  "reachable": true
+                }
+              ],
+              "phase": "restored",
+              "check": "same-namespace-ingress"
+            }
+          ],
+          "passed": true
+        }
       },
       {
         "namespace": "taskboard-terraform",
@@ -290,16 +443,177 @@
         "root_filesystem_write": "rejected",
         "privileged": false,
         "privilege_escalation": false,
-        "networkpolicy_resource": "present"
+        "networkpolicy_resource": "present",
+        "network_policy": {
+          "namespace": "taskboard-terraform",
+          "client_node": "container-security-control-plane",
+          "application_node": "container-security-worker",
+          "cross_node": true,
+          "checks": [
+            {
+              "source_namespace": "taskboard-terraform",
+              "source": "pod/allowed-client",
+              "destination_ip": "192.168.131.198",
+              "expected": "allowed",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": true
+                },
+                {
+                  "reachable": true
+                }
+              ],
+              "phase": "enforced",
+              "check": "same-namespace-ingress"
+            },
+            {
+              "source_namespace": "taskboard-policy-probes",
+              "source": "pod/outside-client",
+              "destination_ip": "192.168.131.198",
+              "expected": "denied",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                },
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                }
+              ],
+              "phase": "enforced",
+              "check": "cross-namespace-ingress"
+            },
+            {
+              "source_namespace": "taskboard-terraform",
+              "source": "deployment/taskboard",
+              "destination_ip": "192.168.175.2",
+              "expected": "denied",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                },
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                }
+              ],
+              "phase": "enforced",
+              "check": "application-egress"
+            },
+            {
+              "source_namespace": "taskboard-policy-probes",
+              "source": "pod/outside-client",
+              "destination_ip": "192.168.131.198",
+              "expected": "allowed",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": true
+                },
+                {
+                  "reachable": true
+                }
+              ],
+              "phase": "control-without-policy",
+              "check": "cross-namespace-ingress"
+            },
+            {
+              "source_namespace": "taskboard-terraform",
+              "source": "deployment/taskboard",
+              "destination_ip": "192.168.175.2",
+              "expected": "allowed",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": true
+                },
+                {
+                  "reachable": true
+                }
+              ],
+              "phase": "control-without-policy",
+              "check": "application-egress"
+            },
+            {
+              "source_namespace": "taskboard-policy-probes",
+              "source": "pod/outside-client",
+              "destination_ip": "192.168.131.198",
+              "expected": "denied",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                },
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                }
+              ],
+              "phase": "restored",
+              "check": "cross-namespace-ingress"
+            },
+            {
+              "source_namespace": "taskboard-terraform",
+              "source": "deployment/taskboard",
+              "destination_ip": "192.168.175.2",
+              "expected": "denied",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                },
+                {
+                  "reachable": false,
+                  "error": "TimeoutError"
+                }
+              ],
+              "phase": "restored",
+              "check": "application-egress"
+            },
+            {
+              "source_namespace": "taskboard-terraform",
+              "source": "pod/allowed-client",
+              "destination_ip": "192.168.131.198",
+              "expected": "allowed",
+              "passed": true,
+              "attempts": [
+                {
+                  "reachable": true
+                },
+                {
+                  "reachable": true
+                }
+              ],
+              "phase": "restored",
+              "check": "same-namespace-ingress"
+            }
+          ],
+          "passed": true
+        }
       }
     ],
-    "networkpolicy_scope": "Resource creation verified. Runtime traffic enforcement requires a compatible CNI.",
+    "networkpolicy_scope": "Cross-node allowed ingress, denied cross-namespace ingress and denied application egress, with policy-removal and restoration controls.",
+    "cni": {
+      "version": "3.33.0",
+      "url": "https://raw.githubusercontent.com/projectcalico/calico/v3.33.0/manifests/calico.yaml",
+      "sha256": "2de8f47595fb9c41b3f47d7b767a1f8e72ecf84057af834738ff12689a234da5"
+    },
     "passed": true,
-    "finished_at": "2026-11-11T21:34:38.799995+00:00"
+    "finished_at": "2026-11-11T22:20:46.496078+00:00"
   },
   "artifact_sha256": {
     "evaluation-baseline": "19219197dbdbc7adf74207a1ecb77faa3e7787a31ff11afc5a20b7ebc1f5385c",
     "evaluation-hardened": "7347f75527a28d9608b0fcfd6e316abed003d884f180828322331d818265af79",
-    "kubernetes-demo": "dce51357ed68cba40b54876a7027afd36d60f44c1309de043e86086384211f7f"
-  }
+    "kubernetes-demo": "dce51357ed68cba40b54876a7027afd36d60f44c1309de043e86086384211f7f",
+    "networkpolicy-verification": "36815f00c544956727568153543324043288226095bda84a134b73fe4b1e5373"
+  },
+  "deployment_run": "https://github.com/SandeshGehani/cloudsec-container-security/actions/runs/43110425889",
+  "deployment_source_commit": "eb5fcd220139ee6f758016ce772faafff7967d4d"
 }

@@ -1,0 +1,12 @@
+{
+  "kind.exe": {
+    "version": "0.33.0",
+    "url": "https://github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-windows-amd64",
+    "sha256": "4b22adaa135368c5a465d56bbd8e520cbea87272a06ca00b6078e7b81515c9fc"
+  },
+  "kubectl.exe": {
+    "version": "1.37.0",
+    "url": "https://dl.k8s.io/release/v1.37.0/bin/windows/amd64/kubectl.exe",
+    "sha256": "4721b614a67bb4932a0369e61f4a323d8c6ca00943d3a2ff14837c124da06f0e"
+  }
+}

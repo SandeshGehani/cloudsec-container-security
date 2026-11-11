@@ -66,9 +66,11 @@ Open [Taskboard](http://127.0.0.1:8080), add a task and mark it complete. Open [
 
 ## Show deployment evidence
 
-Open `reports/kubernetes-demo/verification.json` and `taskboard-hardened.png`. The hosted workflow deployed both YAML and Terraform definitions to a real disposable kind cluster, verified a ready pod, UID 10001, health and task creation, and rejected a root filesystem write. It checked disabled privileges, dropped capabilities and disabled service account token mounting. Terraform created four resources in its own namespace. The workflow deleted the cluster after verification.
+Open `reports/networkpolicy-verification/verification.json` and `taskboard-hardened.png`. The [follow-up hosted workflow](https://github.com/SandeshGehani/cloudsec-container-security/actions/runs/43110425889) deployed both YAML and Terraform definitions to a disposable two-node kind cluster with Calico 3.33.0. It verified a ready pod, UID 10001, health and task creation, and rejected a root filesystem write. It checked disabled privileges, dropped capabilities and disabled service account token mounting. Terraform created four resources in its own namespace. The workflow deleted the cluster after verification.
 
-NetworkPolicy resource creation passed. Traffic-denial enforcement requires a compatible CNI and a traffic test. Docker Desktop and WSL setup on this Windows laptop remains pending for a local cluster demonstration.
+Show `docs/networkpolicy-verification.json`. All 16 cross-node traffic checks passed across both deployment definitions. Same-namespace clients reached the app. Clients in another namespace timed out, and the app's outgoing connections timed out. Removing each policy made the blocked paths reachable. Restoring it blocked them again. Every check required two consecutive matching observations.
+
+Windows kind and kubectl tools are ready in `.tools/bin`. Docker Desktop installation requires administrator approval to enable Virtual Machine Platform and WSL, followed by a Windows restart. See `docs/WINDOWS_SETUP.md` for the prepared commands and engine checks.
 
 To repeat the hosted deployment, open the **Evaluation and Kubernetes demonstration** workflow, choose **Run workflow**, and select main. The workflow also repeats both timing evaluations. Review its retained `kubernetes-demo`, `evaluation-baseline` and `evaluation-hardened` artifacts.
 
