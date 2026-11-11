@@ -7,6 +7,8 @@ on:
       - 'scripts/run_evaluation.py'
       - 'scripts/verify_cluster.py'
       - 'tools/cluster-versions.json'
+      - 'tools/network-versions.json'
+      - 'infra/kind-calico.yaml'
   workflow_dispatch:
 
 permissions:
@@ -79,5 +81,6 @@ jobs:
             reports/kubernetes-demo/*.json
             reports/kubernetes-demo/*.html
             reports/kubernetes-demo/*.png
+            reports/kubernetes-demo/*.yaml
           retention-days: 30
           if-no-files-found: warn
