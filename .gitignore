@@ -1,0 +1,15 @@
+.venv/
+venv/
+work/
+outputs/
+reports/
+.tools/
+.cache/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+__pycache__/
+*.pyc
+*.db
+.env
