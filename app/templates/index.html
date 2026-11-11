@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Taskboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main>
+      <header><p>Container security sample application</p><h1>Taskboard</h1></header>
+      <form action="{{ url_for('add_task') }}" method="post" class="add-task">
+        <label for="title">New task</label>
+        <div><input id="title" name="title" maxlength="200" required autocomplete="off"><button>Add task</button></div>
+      </form>
+      <ul>
+        {% for task in tasks %}
+        <li>
+          <span class="{{ 'done' if task['done'] else '' }}">{{ task['title'] }}</span>
+          <form action="{{ url_for('toggle_task', task_id=task['id']) }}" method="post">
+            <button>{{ 'Reopen' if task['done'] else 'Complete' }}</button>
+          </form>
+        </li>
+        {% else %}
+        <li class="empty">Your tasks will appear here.</li>
+        {% endfor %}
+      </ul>
+    </main>
+  </body>
+</html>

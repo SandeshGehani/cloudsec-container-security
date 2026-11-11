@@ -1,0 +1,2 @@
+PyYAML==6.0.3
+bc-python-hcl2==0.4.3

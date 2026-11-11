@@ -1,0 +1,9 @@
+*
+!app/
+!app/**
+!requirements.txt
+!requirements-baseline.txt
+!fixtures/
+!fixtures/dummy-secret.txt
+**/__pycache__
+**/*.pyc

@@ -1,0 +1,92 @@
+name: Reusable container scan
+
+on:
+  workflow_call:
+    inputs:
+      variant:
+        type: string
+        required: true
+      baseline_evaluation:
+        type: boolean
+        default: false
+      cache:
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  collect-and-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Restore vulnerability database caches
+        if: inputs.cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            .cache/trivy
+            .cache/grype
+            .cache/buildx/${{ inputs.variant }}
+          key: databases-${{ runner.os }}-${{ inputs.variant }}-${{ hashFiles('tools/versions.json') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            databases-${{ runner.os }}-${{ inputs.variant }}-${{ hashFiles('tools/versions.json') }}-
+      - name: Install pinned scanners and report dependencies
+        run: |
+          python -m pip install -r requirements-tools.txt
+          python -m pip install "checkov==$(python -c 'import json; print(json.load(open("tools/versions.json"))["checkov"]["version"])')"
+          python scripts/install_tools.py
+          echo "$PWD/.tools/bin" >> "$GITHUB_PATH"
+      - name: Collect all evidence and evaluate policy
+        id: scan
+        env:
+          VARIANT: ${{ inputs.variant }}
+          BASELINE_EVALUATION: ${{ inputs.baseline_evaluation }}
+          CACHE_ENABLED: ${{ inputs.cache }}
+        run: |
+          arguments=(--variant "$VARIANT" --reports "reports/$VARIANT")
+          if [[ "$BASELINE_EVALUATION" == "true" ]]; then
+            arguments+=(--baseline-evaluation)
+          fi
+          if [[ "$CACHE_ENABLED" != "true" ]]; then
+            arguments+=(--no-cache)
+          fi
+          python scripts/run_pipeline.py "${arguments[@]}"
+      - name: Add gate summary
+        if: always()
+        env:
+          VARIANT: ${{ inputs.variant }}
+        run: |
+          if [[ -f "reports/$VARIANT/summary.md" ]]; then
+            cat "reports/$VARIANT/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Retain available evidence even when the gate fails
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: evidence-${{ inputs.variant }}
+          path: |
+            reports/${{ inputs.variant }}/*.json
+            reports/${{ inputs.variant }}/*.sarif
+            reports/${{ inputs.variant }}/*.html
+            reports/${{ inputs.variant }}/*.md
+            reports/${{ inputs.variant }}/*.log
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Retain the scanned hardened image
+        if: always() && inputs.variant == 'hardened'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: scanned-hardened-image
+          path: reports/hardened/image.tar
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 0

@@ -1,0 +1,33 @@
+{
+  "hadolint": {
+    "version": "2.15.1",
+    "url": "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64",
+    "sha256": "c7187db94eeeeca956519a6af171adc31453941a1e777961f6e680f697c8c507",
+    "archive": false
+  },
+  "trivy": {
+    "version": "0.76.2",
+    "url": "https://github.com/aquasecurity/trivy/releases/download/v0.76.2/trivy_0.76.2_Linux-64bit.tar.gz",
+    "sha256": "bc0fc726e017b8927a62b2d3531d7a84ee01769daf5c99ed866dced54089fdbf",
+    "archive": true
+  },
+  "syft": {
+    "version": "1.57.1",
+    "url": "https://github.com/anchore/syft/releases/download/v1.57.1/syft_1.57.1_linux_amd64.tar.gz",
+    "sha256": "bf52519eb57f675d47c07d43213cb6dff6449f3d6d1147ff6701ed91f44eef0c",
+    "archive": true
+  },
+  "grype": {
+    "version": "0.121.3",
+    "url": "https://github.com/anchore/grype/releases/download/v0.121.3/grype_0.121.3_linux_amd64.tar.gz",
+    "sha256": "e9da18cc1429e786722e32161288103600efffd8e483c90761f90485bd1bec85",
+    "archive": true
+  },
+  "dockle": {
+    "version": "0.4.15",
+    "url": "https://github.com/goodwithtech/dockle/releases/download/v0.4.15/dockle_0.4.15_Linux-64bit.tar.gz",
+    "sha256": "8bfc9183d1d3d67800edb45bea4bb63ddf1d28bec5f89944075a07007d79caad",
+    "archive": true
+  },
+  "checkov": {"version": "3.4.4"}
+}

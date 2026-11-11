@@ -1,0 +1,136 @@
+name: Container security
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Versions to evaluate
+        type: choice
+        options: [both, baseline, hardened]
+        default: both
+      cache:
+        description: Enable image and vulnerability database caching
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: container-security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -r requirements.txt -r requirements-tools.txt
+      - run: python -m unittest discover -s tests -v
+
+  baseline:
+    name: Baseline evaluation with expected policy findings
+    if: github.event_name != 'workflow_dispatch' || inputs.target != 'hardened'
+    uses: ./.github/workflows/scan.yml
+    with:
+      variant: baseline
+      baseline_evaluation: true
+      cache: ${{ github.event_name != 'workflow_dispatch' || inputs.cache }}
+
+  hardened:
+    name: Hardened release gate
+    if: github.event_name != 'workflow_dispatch' || inputs.target != 'baseline'
+    uses: ./.github/workflows/scan.yml
+    with:
+      variant: hardened
+      cache: ${{ github.event_name != 'workflow_dispatch' || inputs.cache }}
+
+  comparison:
+    needs: [baseline, hardened]
+    if: always() && needs.baseline.result != 'skipped' && needs.hardened.result != 'skipped'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: evidence-*
+          path: reports
+      - name: Compare the two versions
+        run: python scripts/report.py --baseline reports/evidence-baseline --hardened reports/evidence-hardened --output reports/comparison.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: comparison
+          path: reports/comparison.json
+          retention-days: 30
+
+  code-scanning:
+    needs: [baseline, hardened]
+    if: always() && vars.UPLOAD_SARIF == 'true' && github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.target == 'both')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [baseline, hardened]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: evidence-${{ matrix.variant }}
+          path: evidence
+      - uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          sarif_file: evidence/trivy.sarif
+          category: container-${{ matrix.variant }}
+
+  publish:
+    needs: [tests, hardened]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.tests.result == 'success' && needs.hardened.result == 'success'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: scanned-hardened-image
+          path: image
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: evidence-hardened
+          path: evidence
+      - name: Load the scanned image and verify its identity
+        run: |
+          python3 -c 'import json; assert json.load(open("evidence/gate.json"))["passed"] is True'
+          docker load --input image/image.tar
+          expected=$(python3 -c 'import json; print(json.load(open("evidence/image-inspect.json"))[0]["Id"])')
+          actual=$(docker image inspect taskboard:hardened --format '{{.Id}}')
+          test "$expected" = "$actual"
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish the exact approved image
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}"
+          docker tag taskboard:hardened "$image"
+          docker push "$image"
+          echo "Published \`$image\`" >> "$GITHUB_STEP_SUMMARY"
