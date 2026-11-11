@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def write_report(directory, gate):
-    run = json.loads((directory / 'run.json').read_text())
+    run = json.loads((directory / 'run.json').read_text(encoding='utf-8'))
     status = 'PASS' if gate['passed'] else 'FAIL'
     rows = ''.join(
         f'<tr><td>{html.escape(name)}</td><td>{stage["status"]}</td><td>{stage["duration_seconds"]:.3f}</td></tr>'
@@ -48,8 +48,8 @@ Collection duration {run['duration_seconds']:.3f} seconds. Cache enabled {run['c
 
 
 def compare(baseline, hardened, output):
-    gates = [json.loads((directory / 'gate.json').read_text()) for directory in (baseline, hardened)]
-    runs = [json.loads((directory / 'run.json').read_text()) for directory in (baseline, hardened)]
+    gates = [json.loads((directory / 'gate.json').read_text(encoding='utf-8')) for directory in (baseline, hardened)]
+    runs = [json.loads((directory / 'run.json').read_text(encoding='utf-8')) for directory in (baseline, hardened)]
     result = {'variants': {}}
     for directory, gate, run in zip((baseline, hardened), gates, runs):
         identifiers = {
@@ -57,7 +57,7 @@ def compare(baseline, hardened, output):
             for tool in ('trivy', 'grype')
         }
         image_path = directory / 'image-inspect.json'
-        image = json.loads(image_path.read_text())[0] if image_path.exists() else {}
+        image = json.loads(image_path.read_text(encoding='utf-8'))[0] if image_path.exists() else {}
         result['variants'][gate['variant']] = {
             'passed': gate['passed'], 'errors': gate['errors'],
             'severity_counts': gate['severity_counts'],

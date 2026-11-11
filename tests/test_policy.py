@@ -69,6 +69,29 @@ class PolicyTests(unittest.TestCase):
         self.write('run.json', run)
         self.assertFalse(self.evaluate()['passed'])
 
+    def test_current_grype_database_metadata_passes(self):
+        report = self.read('grype.json')
+        report['descriptor']['db'] = {
+            'status': {'built': '2026-11-12T00:00:00Z', 'valid': True},
+            'providers': {'debian': {'captured': '2026-11-12T00:00:00Z'}},
+        }
+        self.write('grype.json', report)
+        self.assertTrue(self.evaluate()['passed'])
+
+    def test_invalid_grype_database_blocks(self):
+        report = self.read('grype.json')
+        report['descriptor']['db'] = {
+            'status': {'built': '2026-11-12T00:00:00Z', 'valid': False},
+        }
+        self.write('grype.json', report)
+        self.assertFalse(self.evaluate()['passed'])
+
+    def test_missing_grype_database_timestamp_blocks(self):
+        report = self.read('grype.json')
+        report['descriptor']['db'] = {'status': {'valid': True}}
+        self.write('grype.json', report)
+        self.assertFalse(self.evaluate()['passed'])
+
     def test_missing_required_check_blocks(self):
         checkov = self.read('checkov-kubernetes.json')
         checkov['results']['passed_checks'].pop()

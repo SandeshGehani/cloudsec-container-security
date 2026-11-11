@@ -135,7 +135,9 @@ def evaluate(directory, policy_path=ROOT / 'policy' / 'gates.json'):
     trivy = read('trivy.json', trivy_rules)
 
     def grype_rules(document):
-        if not isinstance(document['matches'], list) or not document['descriptor']['db']['built']:
+        database = document['descriptor']['db']
+        status = database.get('status', database)
+        if not isinstance(document['matches'], list) or not status['built'] or status.get('valid') is False:
             raise ValueError('Grype matches or database metadata missing')
 
     grype = read('grype.json', grype_rules)
