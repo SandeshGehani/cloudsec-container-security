@@ -1,5 +1,6 @@
 """Install checksum-pinned scanner binaries on Linux x86-64 CI runners."""
 
+import argparse
 import hashlib
 import io
 import json
@@ -28,11 +29,14 @@ def download(url):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--manifest', type=Path, default=ROOT / 'tools' / 'versions.json')
+    args = parser.parse_args()
     if platform.system() != 'Linux' or platform.machine() not in ('x86_64', 'AMD64'):
         raise SystemExit('Run scanner installation in Linux x86-64, including WSL2 or GitHub Actions.')
     destination = ROOT / '.tools' / 'bin'
     destination.mkdir(parents=True, exist_ok=True)
-    versions = json.loads((ROOT / 'tools' / 'versions.json').read_text())
+    versions = json.loads(args.manifest.read_text(encoding='utf-8'))
     for name, specification in versions.items():
         if 'url' not in specification:
             continue

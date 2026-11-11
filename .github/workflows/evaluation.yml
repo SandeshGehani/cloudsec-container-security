@@ -1,0 +1,83 @@
+name: Evaluation and Kubernetes demonstration
+
+on:
+  push:
+    paths:
+      - '.github/workflows/evaluation.yml'
+      - 'scripts/run_evaluation.py'
+      - 'scripts/verify_cluster.py'
+      - 'tools/cluster-versions.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    name: Repeated evaluation (${{ matrix.variant }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [baseline, hardened]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Install pinned scanners
+        run: |
+          python -m pip install -r requirements-tools.txt 'checkov==3.4.4'
+          python scripts/install_tools.py
+          echo "$PWD/.tools/bin" >> "$GITHUB_PATH"
+      - name: Collect three cold and three warm measurements
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: python scripts/run_evaluation.py --variant "$VARIANT" --output "reports/evaluation-$VARIANT"
+      - name: Retain evaluation evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: evaluation-${{ matrix.variant }}
+          path: reports/evaluation-${{ matrix.variant }}/
+          retention-days: 30
+          if-no-files-found: warn
+
+  kubernetes-demo:
+    name: YAML and Terraform Kubernetes verification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: '1.17.2'
+          terraform_wrapper: false
+      - name: Install pinned cluster tools
+        run: |
+          python scripts/install_tools.py --manifest tools/cluster-versions.json
+          echo "$PWD/.tools/bin" >> "$GITHUB_PATH"
+      - name: Deploy and verify both infrastructure definitions
+        run: python scripts/verify_cluster.py --output reports/kubernetes-demo
+      - name: Retain deployment evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: kubernetes-demo
+          path: |
+            reports/kubernetes-demo/*.log
+            reports/kubernetes-demo/*.json
+            reports/kubernetes-demo/*.html
+            reports/kubernetes-demo/*.png
+          retention-days: 30
+          if-no-files-found: warn
