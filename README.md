@@ -13,7 +13,16 @@ The baseline intentionally includes an old Python image, outdated application de
 - Regression tests cover app behaviour, vulnerability thresholds, root execution, missing reports, scanner failures, and skipped required checks.
 - An automated comparison records vulnerability counts, exact-ID overlap, image size, and pipeline durations.
 
-Container builds, scanner execution against images, registry publication, and cluster deployment require verification in an environment with Docker. The final evaluation report and presentation depend on collecting those results.
+The [verified GitHub Actions run](https://github.com/SandeshGehani/cloudsec-container-security/actions/runs/43101046408) built both images, completed every scanner, passed all 23 regression tests, uploaded SARIF results, and published the approved hardened image. The baseline security gate rejected its image while retaining its reports.
+
+| Variant | Security gate | Blocking findings | Image size in MB | Collection time in seconds |
+| --- | --- | --- | --- | --- |
+| Baseline | FAIL | 4,981 | 928.46 | 166.723 |
+| Hardened | PASS | 0 | 127.16 | 100.575 |
+
+These measurements come from one run of each variant. Findings without an available fix remain visible in the scan reports under the agreed gate policy. Repeated cold and warm runs, manual false-positive review, local Kubernetes deployment, and the final report and presentation remain subsequent milestones.
+
+The approved image was published as `ghcr.io/sandeshgehani/cloudsec-container-security:07ca919e4a820ee6f55a5bcadec649909835e8a7` with registry digest `sha256:141854f7c4db04171ac8ae45239caa44c72372560c0f7cb03156bccc540c4b98`.
 
 ## Run the app on Windows
 
