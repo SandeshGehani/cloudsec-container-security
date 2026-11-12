@@ -70,7 +70,7 @@ Open `reports/networkpolicy-verification/verification.json` and `taskboard-harde
 
 Show `docs/networkpolicy-verification.json`. All 16 cross-node traffic checks passed across both deployment definitions. Same-namespace clients reached the app. Clients in another namespace timed out, and the app's outgoing connections timed out. Removing each policy made the blocked paths reachable. Restoring it blocked them again. Every check required two consecutive matching observations.
 
-Windows kind and kubectl tools are ready in `.tools/bin`. Docker Desktop installation requires administrator approval to enable Virtual Machine Platform and WSL, followed by a Windows restart. See `docs/WINDOWS_SETUP.md` for the prepared commands and engine checks.
+Windows kind and kubectl tools are ready in `.tools/bin`. WSL 3.0.5 and Docker Desktop are installed, and the administrator-approved Windows features require a restart. After restarting, start Docker Desktop and complete the engine and local cluster checks in `docs/WINDOWS_SETUP.md`.
 
 To repeat the hosted deployment, open the **Evaluation and Kubernetes demonstration** workflow, choose **Run workflow**, and select main. The workflow also repeats both timing evaluations. Review its retained `kubernetes-demo`, `evaluation-baseline` and `evaluation-hardened` artifacts.
 

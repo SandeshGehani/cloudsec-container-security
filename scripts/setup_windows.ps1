@@ -24,13 +24,15 @@ if ($EnableWsl) {
         }
         $featureResults | Select-Object Online, RestartNeeded | ConvertTo-Json |
             Set-Content -LiteralPath (Join-Path $projectWork 'wsl-features.json') -Encoding UTF8
-        & wsl.exe --install --no-distribution --web-download --no-launch 2>&1 |
-            Out-File -LiteralPath (Join-Path $projectWork 'wsl-install.log') -Encoding UTF8
-        $wslExitCode = $LASTEXITCODE
+        $wslInstaller = Start-Process -FilePath 'wsl.exe' -WindowStyle Hidden -PassThru -Wait `
+            -ArgumentList '--install', '--no-distribution', '--web-download', '--no-launch' `
+            -RedirectStandardOutput (Join-Path $projectWork 'wsl-install.log') `
+            -RedirectStandardError (Join-Path $projectWork 'wsl-install-error.log')
+        $wslExitCode = $wslInstaller.ExitCode
         Write-Output "WSL installer exit code $wslExitCode"
         Write-Output 'Save your work and restart Windows before checking the container engine.'
         if ($wslExitCode -notin @(0, 3010)) {
-            throw "WSL installation needs attention. Review work\wsl-install.log. Exit code $wslExitCode"
+            throw "WSL installation needs attention. Review work\wsl-install.log and work\wsl-install-error.log. Exit code $wslExitCode"
         }
     } finally {
         Stop-Transcript | Out-Null
